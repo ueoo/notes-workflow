@@ -17,14 +17,18 @@ const sfItems = Application("Notes").folders().flatMap(folderReference => {
   if (ignoredFolders.find(ignoredFolder => ignoredFolder === folderName)) return []
 
   return folderReference.notes().map(noteReference => {
-    const note = noteReference.properties()
+    try {
+      const note = noteReference.properties()
 
-    return {
-      uid: note.id,
-      title: note.passwordProtected ? "🔒" + note.name : note.name,
-      subtitle: folderName,
-      arg: note.id,
-      match: folderName + " " + note.name + " " + note.plaintext
+      return {
+        uid: note.id,
+        title: note.passwordProtected ? "🔒" + note.name : note.name,
+        subtitle: folderName,
+        arg: note.id,
+        match: folderName + " " + note.name + " " + note.plaintext
+      }
+    } catch {
+      throw `Corrupted note: ${noteReference.name()}. Try editing it and replacing images.`
     }
   })
 })
